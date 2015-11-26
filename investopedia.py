@@ -2,6 +2,7 @@
 # Makes use of Python's mechanize library
 import mechanize
 from enum import Enum
+from collections import namedtuple
 
 class Action(Enum):
     buy = 1
@@ -77,7 +78,9 @@ class Account:
         return_value = html[return_begin + len(return_str) + 4:return_end-1]
         return_value = float(return_value.replace('%', ''))
 
-        return account_value, buying_power_value, cash_value, return_value
+        Status = namedtuple("Status","account_val buying_power cash annual_return")
+        portfolio_status = Status(account_val = account_value, buying_power = buying_power_value, cash = cash_value, annual_return = return_value)
+        return portfolio_status
 
 
     def trade(self, symbol, orderType, quantity, priceType="Market", price=False, duration=Duration.good_cancel):

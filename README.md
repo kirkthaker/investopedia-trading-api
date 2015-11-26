@@ -25,7 +25,10 @@ client = Account("emailaddress","password")
 Get account status (cash on hand, annual return, etc.):
 ```python
 status = client.getPortfolioStatus()
-print status
+print status.account_val
+print status.buying_power
+print status.cash
+print status.annual_return
 ```
 
 Buying 10 shares of Google (GOOG) at market price:

@@ -41,43 +41,43 @@ class Account:
         # account value, buying power, cash on hand, and annual return
         # Annual return is a percentage, not a decimal
 
-        accountUrl = "http://www.investopedia.com/simulator/portfolio/"
-        response = handle.open(accountUrl)
+        account_url = "http://www.investopedia.com/simulator/portfolio/"
+        response = handle.open(account_url)
 
         html = response.read()
 
         # The ids of all the account information values
-        acctValStr = "ctl00_MainPlaceHolder_currencyFilter_ctrlPortfolioDetails_PortfolioSummary_lblAccountValue"
-        buyingPowerStr = "ctl00_MainPlaceHolder_currencyFilter_ctrlPortfolioDetails_PortfolioSummary_lblBuyingPower"
-        cashStr = "ctl00_MainPlaceHolder_currencyFilter_ctrlPortfolioDetails_PortfolioSummary_lblCash"
-        returnStr = "ctl00_MainPlaceHolder_currencyFilter_ctrlPortfolioDetails_PortfolioSummary_lblAnnualReturn"
+        acct_val_str = "ctl00_MainPlaceHolder_currencyFilter_ctrlPortfolioDetails_PortfolioSummary_lblAccountValue"
+        buying_power_str = "ctl00_MainPlaceHolder_currencyFilter_ctrlPortfolioDetails_PortfolioSummary_lblBuyingPower"
+        cash_str = "ctl00_MainPlaceHolder_currencyFilter_ctrlPortfolioDetails_PortfolioSummary_lblCash"
+        return_str = "ctl00_MainPlaceHolder_currencyFilter_ctrlPortfolioDetails_PortfolioSummary_lblAnnualReturn"
         # The values all end with the HTML tag "span"
-        endStr = "</span>"
+        end_str = "</span>"
 
         # Get the beginning and ending points, then simply slice out the string.
         # Simply use the find function to get the required values
         # This could probably be more elegant...
-        acctBegin = html.find(acctValStr)
-        acctEnd = html.find(endStr, acctBegin)
-        accountValue = html[acctBegin + len(acctValStr) + 3:acctEnd]
-        accountValue = float(accountValue.replace(',', ''))
+        acct_begin = html.find(acct_val_str)
+        acct_end = html.find(end_str, acct_begin)
+        account_value = html[acct_begin + len(acct_val_str) + 3:acct_end]
+        account_value = float(account_value.replace(',', ''))
 
-        buyingPowerBegin = html.find(buyingPowerStr)
-        buyingPowerEnd = html.find(endStr, buyingPowerBegin)
-        buyingPowerValue = html[buyingPowerBegin + len(buyingPowerStr) + 3:buyingPowerEnd]
-        buyingPowerValue = float(buyingPowerValue.replace(',', ''))
+        buying_power_begin = html.find(buying_power_str)
+        buying_power_end = html.find(end_str, buying_power_begin)
+        buying_power_value = html[buying_power_begin + len(buying_power_str) + 3:buying_power_end]
+        buying_power_value = float(buying_power_value.replace(',', ''))
 
-        cashBegin = html.find(cashStr)
-        cashEnd = html.find(endStr, cashBegin)
-        cashValue = html[cashBegin + len(cashStr) + 3:cashEnd]
-        cashValue = float(cashValue.replace(',', ''))
+        cash_begin = html.find(cash_str)
+        cash_end = html.find(end_str, cash_begin)
+        cash_value = html[cash_begin + len(cash_str) + 3:cash_end]
+        cash_value = float(cash_value.replace(',', ''))
 
-        returnBegin = html.find(returnStr)
-        returnEnd = html.find(endStr, returnBegin)
-        returnValue = html[returnBegin + len(returnStr) + 4:returnEnd-1]
-        returnValue = float(returnValue.replace('%', ''))
+        return_begin = html.find(return_str)
+        return_end = html.find(end_str, return_begin)
+        return_value = html[return_begin + len(return_str) + 4:return_end-1]
+        return_value = float(return_value.replace('%', ''))
 
-        return accountValue, buyingPowerValue, cashValue, returnValue
+        return account_value, buying_power_value, cash_value, return_value
 
 
     def trade(self, symbol, orderType, quantity, priceType="Market", price=False, duration=Duration.good_cancel):
@@ -113,8 +113,8 @@ class Account:
         result = True
 
         try:
-            tradingUrl = "http://www.investopedia.com/simulator/trade/tradestock.aspx"
-            handle.open(tradingUrl)
+            trading_url = "http://www.investopedia.com/simulator/trade/tradestock.aspx"
+            handle.open(trading_url)
             handle.select_form(name="simTrade")
 
             # input order type, quantity, etc.

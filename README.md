@@ -6,32 +6,44 @@ For this API to be useful you need an Investopedia trading account,
 and you can make one [here](http://www.investopedia.com/simulator/).
 
 It also makes extensive use of Python's mechanize library, so you'll need
-to install that as well. See [here](http://wwwsearch.sourceforge.net/mechanize/)
+to install that as well. See [here](http://wwwsearch.sourceforge.net/mechanize/).
 
-Some usage examples (assuming you've correctly imported the file and everything)
+You'll also need to backported enum library for Python 2.7. See [here](https://pypi.python.org/pypi/enum34/).
 
-Logging into the simulator
+Some usage examples:
+
+Import all the classes:
 ```python
-handle = investopedia.login("emailaddress","password")
+from investopedia import *
 ```
 
-Getting account status
+Log into the simulator:
 ```python
-status = investopedia.getPortfolioStatus(handle)
+client = Account("emailaddress","password")
+```
+
+Get account status (cash on hand, annual return, etc.):
+```python
+status = client.getPortfolioStatus()
 print status
 ```
 
-Buying 10 shares of Google (GOOG) at market price
+Buying 10 shares of Google (GOOG) at market price:
 ```python
-investopedia.trade(handle, "GOOG", 1, 10)
+client.trade("GOOG", Action.buy, 10)
 ```
 
-Selling 10 shares of Google at market price
+Selling 10 shares of Google at market price:
 ```python
-investopedia.trade(handle,"GOOG", 2, 10)
+client.trade("GOOG", Action.sell, 10)
+```
+
+Shorting 10 shares of Google:
+```python
+client.trade("GOOG", Action.short, 10)
 ```
 
 Buying 10 shares of Google with a limit order at $500
 ```python
-investopedia.trade(handle,"GOOG", 1, 10, "Limit", 500)
+client.trade("GOOG", Action.buy, 10, "Limit", 500)
 ```

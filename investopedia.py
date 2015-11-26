@@ -82,31 +82,8 @@ class Account:
 
     def trade(self, symbol, orderType, quantity, priceType="Market", price=False, duration=Duration.good_cancel):
         # This function executes trades on the platform
-        # It takes the following inputs:
-
-        # 1. handle - this is what the function login(username, password) returns.
-        # You need it because it contains the logged in session information
-
-        # 2. symbol - symbol of the security ("GOOG", "AAPL", etc.).
-        # Type is string.
-
-        # 3. orderType - 1 is buy, 2 is sell, 3 is sell short, 4 is buy to cover
-        # Type is int.
-
-        # 4. quantity - number of shares to buy.
-        # Type is int.
-
-        # 5. priceType - Type of pricing: Market, Limit, or Stop. Case sensitive.
-        # Type is string.
-
-        # 6. price - If you're executing a Limit/Stop order - the price wanted.
-        # Type is float.
-
-        # duration - How long it's valid (good until cancelled is 2, day order is 1)
-        # Type is int.
-
-        # It returns a boolean called result that is true if trading was successful
-        # and false if it was not.
+        # See the readme.md file for examples on use and inputs
+        # It outputs True if the trade was successful and False if it was not.
 
         #open the trading page and select the trading form
         handle = self.br

@@ -1,9 +1,20 @@
 # A class for executing trades on Investopedia's Stock simulator
 # Makes use of Python's mechanize library
 import mechanize
+from enum import Enum
+
+class Action(Enum):
+    buy = 1
+    sell = 2
+    short = 3
+    cover = 4
+
+class Duration(Enum):
+    day_order = 1
+    good_cancel = 2
 
 class Account:
-    def __init__(self, username, password):
+    def __init__(self, email, password):
         # Logs a user into Investopedia's trading simulator
         # It takes their username & password and returns a handler called br
         # br can then be used to execute trades.
@@ -16,7 +27,7 @@ class Account:
         # the login form happens to be at nr=2
         br.select_form(nr=2)
 
-        br.form["email"] = username
+        br.form["email"] = email
         br.form["password"] = password
 
         br.submit()
@@ -69,7 +80,7 @@ class Account:
         return accountValue, buyingPowerValue, cashValue, returnValue
 
 
-    def trade(self, symbol, orderType, quantity, priceType="Market", price=False, duration=2):
+    def trade(self, symbol, orderType, quantity, priceType="Market", price=False, duration=Duration.good_cancel):
         # This function executes trades on the platform
         # It takes the following inputs:
 
@@ -109,9 +120,9 @@ class Account:
             # input order type, quantity, etc.
             handle.form["symbolTextbox"] = symbol
             handle.form["quantityTextbox"] = str(quantity)
-            handle.form["transactionTypeDropDown"] = [str(orderType)]
+            handle.form["transactionTypeDropDown"] = [str(orderType.value)]
             handle.form["Price"] = [priceType]
-            handle.form["durationTypeDropDown"] = [str(duration)]
+            handle.form["durationTypeDropDown"] = [str(duration.value)]
 
             # no price to specify - we'll take the market price.
             if priceType == "Market":

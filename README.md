@@ -5,5 +5,5 @@ Of course, for this API to be useful, you need an Investopedia trading account,
 which you can make [here](http://www.investopedia.com/simulator/).
 
 Some usage examples:
-    test code
-    more code
+   test code
+   more code

@@ -1,6 +1,6 @@
 # investopedia-trading-api
 An API, written in Python, for Investopedia's paper trading stock simulator.
-Pull requests welcome.
+Pull requests welcome!
 
 For this API to be useful you need an Investopedia trading account,
 and you can make one [here](http://www.investopedia.com/simulator/).

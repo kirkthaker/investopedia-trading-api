@@ -32,5 +32,5 @@ investopedia.trade(handle,"GOOG", 2, 10)
 
 Buying 10 shares of Google with a limit order at $500
 ```python
-investopedia.trade(handle,"GOOG", 1, 10, priceType="Limit", 500)
+investopedia.trade(handle,"GOOG", 1, 10, "Limit", 500)
 ```

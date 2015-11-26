@@ -1,2 +1,5 @@
 # investopedia-trading-api
-A trading api of sorts, written in Python, for Investopedia's paper trading stock simulator.
+A an API, written in Python, for Investopedia's paper trading stock simulator.
+
+Of course, for this API to be useful, you need an Investopedia trading account
+which you can make here.

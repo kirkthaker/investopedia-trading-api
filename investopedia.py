@@ -90,38 +90,34 @@ class Account:
 
         #open the trading page and select the trading form
         handle = self.br
-        result = True
 
-        try:
-            trading_url = "http://www.investopedia.com/simulator/trade/tradestock.aspx"
-            handle.open(trading_url)
-            handle.select_form(name="simTrade")
+        trading_url = "http://www.investopedia.com/simulator/trade/tradestock.aspx"
+        handle.open(trading_url)
+        handle.select_form(name="simTrade")
 
-            # input order type, quantity, etc.
-            handle.form["symbolTextbox"] = symbol
-            handle.form["quantityTextbox"] = str(quantity)
-            handle.form["transactionTypeDropDown"] = [str(orderType.value)]
-            handle.form["Price"] = [priceType]
-            handle.form["durationTypeDropDown"] = [str(duration.value)]
+        # input order type, quantity, etc.
+        handle.form["symbolTextbox"] = symbol
+        handle.form["quantityTextbox"] = str(quantity)
+        handle.form["transactionTypeDropDown"] = [str(orderType.value)]
+        handle.form["Price"] = [priceType]
+        handle.form["durationTypeDropDown"] = [str(duration.value)]
 
-            # no price to specify - we'll take the market price.
-            if priceType == "Market":
-                handle.submit()
-                handle.select_form(name="simTradePreview")
-                handle.submit()
+        # no price to specify - we'll take the market price.
+        if priceType == "Market":
+            handle.submit()
+            handle.select_form(name="simTradePreview")
+            handle.submit()
 
-            # if a limit or stop order is made, we have to specify the price
-            elif price != False:
-                if priceType == "Limit":
-                    handle.form["limitPriceTextBox"] = str(price)
-                elif priceType == "Stop":
-                    handle.form["stopPriceTextBox"] = str(price)
-                # submit the form and then submit the "preview order" page that follows
-                # (that's why we have two "submits")
-                handle.submit()
-                handle.select_form(name="simTradePreview")
-                handle.submit()
-        except:
-            result = False
+        # if a limit or stop order is made, we have to specify the price
+        elif price != False:
+            if priceType == "Limit":
+                handle.form["limitPriceTextBox"] = str(price)
+            elif priceType == "Stop":
+                handle.form["stopPriceTextBox"] = str(price)
+            # submit the form and then submit the "preview order" page that follows
+            # (that's why we have two "submits")
+            handle.submit()
+            handle.select_form(name="simTradePreview")
+            handle.submit()
 
-        return result
+        return True

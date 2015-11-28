@@ -41,8 +41,8 @@ class Account:
         # Annual return is a percentage, not a decimal
 
         handle = self.br
-        account_url = "http://www.investopedia.com/simulator/portfolio/"
-        response = handle.open(account_url)
+        url = "http://www.investopedia.com/simulator/portfolio/"
+        response = handle.open(url)
 
         html = response.read()
 
@@ -88,8 +88,8 @@ class Account:
         # It outputs True if the trade was successful and False if it was not.
 
         handle = self.br
-        trading_url = "http://www.investopedia.com/simulator/trade/tradestock.aspx"
-        handle.open(trading_url)
+        url = "http://www.investopedia.com/simulator/trade/tradestock.aspx"
+        handle.open(url)
         handle.select_form(name="simTrade")
 
         # input order type, quantity, etc.

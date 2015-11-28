@@ -1,8 +1,7 @@
-# A class for executing trades on Investopedia's Stock simulator
-# Makes use of Python's mechanize library
 import mechanize
 from enum import Enum
 from collections import namedtuple
+
 
 class Action(Enum):
     buy = 1
@@ -10,41 +9,46 @@ class Action(Enum):
     short = 3
     cover = 4
 
+
 class Duration(Enum):
     day_order = 1
     good_cancel = 2
 
-class Account:
-    def __init__(self, email, password):
-        # Logs a user into Investopedia's trading simulator
-        # It takes their username & password and returns a handler called br
-        # br can then be used to execute trades.
 
-        br = mechanize.Browser()
-        url = "http://www.investopedia.com/accounts/login.aspx?returnurl=http://www.investopedia.com/simulator/"
-        br.open(url)
+Status = namedtuple("Status", "account_val buying_power cash annual_return")
+
+
+class Account:
+    BASE_URL = 'http://www.investopedia.com'
+
+    def __init__(self, email, password):
+        """
+        Logs a user into Investopedia's trading simulator,
+        given a *username* and *password*.
+        """
+
+        self.br = br = mechanize.Browser()
+        self.fetch("/accounts/login.aspx?returnurl=http://www.investopedia.com/simulator/")
 
         # you have to select the form before you can input information to it
         # the login form happens to be at nr=2
         br.select_form(nr=2)
-
         br.form["email"] = email
         br.form["password"] = password
-
         br.submit()
 
-        # return the handle, br, so that we can use it later on for trading, etc.
-        self.br = br
+    def fetch(self, url):
+        url = '%s%s' % (self.BASE_URL, url)
+        return self.br.open(url)
 
-    def getPortfolioStatus(self):
-        handle = self.br
-        # This function takes our mechanize handle and returns:
-        # account value, buying power, cash on hand, and annual return
-        # Annual return is a percentage, not a decimal
+    def get_portfolio_status(self):
+        """
+        Returns a Status object containing account value,
+        buying power, cash on hand, and annual return.
+        Annual return is a percentage.
+        """
 
-        account_url = "http://www.investopedia.com/simulator/portfolio/"
-        response = handle.open(account_url)
-
+        response = self.fetch('/simulator/portfolio/')
         html = response.read()
 
         # The ids of all the account information values
@@ -78,21 +82,23 @@ class Account:
         return_value = html[return_begin + len(return_str) + 4:return_end-1]
         return_value = float(return_value.replace('%', ''))
 
-        Status = namedtuple("Status","account_val buying_power cash annual_return")
-        portfolio_status = Status(account_val = account_value, buying_power = buying_power_value, cash = cash_value, annual_return = return_value)
-        return portfolio_status
-
+        return Status(
+            account_val=account_value,
+            buying_power=buying_power_value,
+            cash=cash_value,
+            annual_return=return_value,
+        )
 
     def trade(self, symbol, orderType, quantity, priceType="Market", price=False, duration=Duration.good_cancel):
-        # This function executes trades on the platform
-        # See the readme.md file for examples on use and inputs
-        # It outputs True if the trade was successful and False if it was not.
+        """
+        Executes trades on the platform. See the readme.md file
+        for examples on use and inputs. Returns True if the
+        trade was successful. Else an exception will be
+        raised.
+        """
 
-        #open the trading page and select the trading form
+        self.fetch('/simulator/trade/tradestock.aspx')
         handle = self.br
-
-        trading_url = "http://www.investopedia.com/simulator/trade/tradestock.aspx"
-        handle.open(trading_url)
         handle.select_form(name="simTrade")
 
         # input order type, quantity, etc.

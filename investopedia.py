@@ -93,7 +93,7 @@ class Account:
         # See the readme.md file for examples on use and inputs
         # It outputs True if the trade was successful and False if it was not.
 
-        self.go(self.url('/simulator/trade/tradestock.aspx'))
+        self.go('/simulator/trade/tradestock.aspx')
         handle = self.br
         handle.select_form(name="simTrade")
 

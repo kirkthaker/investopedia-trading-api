@@ -28,7 +28,7 @@ class Account:
         """
 
         self.br = br = mechanize.Browser()
-        self.go("/accounts/login.aspx?returnurl=http://www.investopedia.com/simulator/")
+        self.fetch("/accounts/login.aspx?returnurl=http://www.investopedia.com/simulator/")
 
         # you have to select the form before you can input information to it
         # the login form happens to be at nr=2
@@ -37,7 +37,7 @@ class Account:
         br.form["password"] = password
         br.submit()
 
-    def go(self, url):
+    def fetch(self, url):
         url = '%s%s' % (self.BASE_URL, url)
         return self.br.open(url)
 
@@ -48,7 +48,7 @@ class Account:
         Annual return is a percentage.
         """
 
-        response = self.go('/simulator/portfolio/')
+        response = self.fetch('/simulator/portfolio/')
         html = response.read()
 
         # The ids of all the account information values
@@ -97,7 +97,7 @@ class Account:
         raised.
         """
 
-        self.go('/simulator/trade/tradestock.aspx')
+        self.fetch('/simulator/trade/tradestock.aspx')
         handle = self.br
         handle.select_form(name="simTrade")
 

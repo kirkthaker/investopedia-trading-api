@@ -24,7 +24,7 @@ client = Account("emailaddress","password")
 
 Get account status (cash on hand, annual return, etc.):
 ```python
-status = client.getPortfolioStatus()
+status = client.get_portfolio_status()
 print status.account_val
 print status.buying_power
 print status.cash

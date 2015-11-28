@@ -17,18 +17,20 @@ class Duration(Enum):
     good_cancel = 2
 
 
-Status = namedtuple("Status","account_val buying_power cash annual_return")
+Status = namedtuple("Status", "account_val buying_power cash annual_return")
 
 
 class Account:
+    BASE_URL = 'http://www.investopedia.com'
+
     def __init__(self, email, password):
         # Logs a user into Investopedia's trading simulator
         # It takes their username & password and returns a handler called br
         # br can then be used to execute trades.
 
         br = mechanize.Browser()
-        url = "http://www.investopedia.com/accounts/login.aspx?returnurl=http://www.investopedia.com/simulator/"
-        br.open(url)
+        url = "/accounts/login.aspx?returnurl=http://www.investopedia.com/simulator/"
+        br.open(self.url(url))
 
         # you have to select the form before you can input information to it
         # the login form happens to be at nr=2
@@ -41,14 +43,16 @@ class Account:
 
         self.br = br
 
+    def url(self, url):
+        return '%s%s' % (self.BASE_URL, url)
+
     def get_portfolio_status(self):
         # This function takes our mechanize handle and returns:
         # account value, buying power, cash on hand, and annual return
         # Annual return is a percentage, not a decimal
 
         handle = self.br
-        url = "http://www.investopedia.com/simulator/portfolio/"
-        response = handle.open(url)
+        response = handle.open(self.url('/simulator/portfolio/'))
 
         html = response.read()
 
@@ -86,15 +90,13 @@ class Account:
         portfolio_status = Status(account_val=account_value, buying_power=buying_power_value, cash=cash_value, annual_return=return_value)
         return portfolio_status
 
-
     def trade(self, symbol, orderType, quantity, priceType="Market", price=False, duration=Duration.good_cancel):
         # This function executes trades on the platform
         # See the readme.md file for examples on use and inputs
         # It outputs True if the trade was successful and False if it was not.
 
         handle = self.br
-        url = "http://www.investopedia.com/simulator/trade/tradestock.aspx"
-        handle.open(url)
+        handle.open(self.url('/simulator/trade/tradestock.aspx'))
         handle.select_form(name="simTrade")
 
         # input order type, quantity, etc.

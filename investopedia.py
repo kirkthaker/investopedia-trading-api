@@ -1,5 +1,3 @@
-# A class for executing trades on Investopedia's Stock simulator
-# Makes use of Python's mechanize library
 import mechanize
 from enum import Enum
 from collections import namedtuple
@@ -24,9 +22,10 @@ class Account:
     BASE_URL = 'http://www.investopedia.com'
 
     def __init__(self, email, password):
-        # Logs a user into Investopedia's trading simulator
-        # It takes their username & password and returns a handler called br
-        # br can then be used to execute trades.
+        """
+        Logs a user into Investopedia's trading simulator,
+        given a *username* and *password*.
+        """
 
         self.br = br = mechanize.Browser()
         self.go("/accounts/login.aspx?returnurl=http://www.investopedia.com/simulator/")
@@ -43,9 +42,11 @@ class Account:
         return self.br.open(url)
 
     def get_portfolio_status(self):
-        # This function takes our mechanize handle and returns:
-        # account value, buying power, cash on hand, and annual return
-        # Annual return is a percentage, not a decimal
+        """
+        Returns a Status object containing account value,
+        buying power, cash on hand, and annual return.
+        Annual return is a percentage.
+        """
 
         response = self.go('/simulator/portfolio/')
         html = response.read()
@@ -89,9 +90,12 @@ class Account:
         )
 
     def trade(self, symbol, orderType, quantity, priceType="Market", price=False, duration=Duration.good_cancel):
-        # This function executes trades on the platform
-        # See the readme.md file for examples on use and inputs
-        # It outputs True if the trade was successful and False if it was not.
+        """
+        Executes trades on the platform. See the readme.md file
+        for examples on use and inputs. Returns True if the
+        trade was successful. Else an exception will be
+        raised.
+        """
 
         self.go('/simulator/trade/tradestock.aspx')
         handle = self.br

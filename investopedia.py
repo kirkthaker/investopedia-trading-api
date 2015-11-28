@@ -4,15 +4,18 @@ import mechanize
 from enum import Enum
 from collections import namedtuple
 
+
 class Action(Enum):
     buy = 1
     sell = 2
     short = 3
     cover = 4
 
+
 class Duration(Enum):
     day_order = 1
     good_cancel = 2
+
 
 class Account:
     def __init__(self, email, password):
@@ -35,7 +38,7 @@ class Account:
 
         self.br = br
 
-    def getPortfolioStatus(self):
+    def get_portfolio_status(self):
         # This function takes our mechanize handle and returns:
         # account value, buying power, cash on hand, and annual return
         # Annual return is a percentage, not a decimal
@@ -78,7 +81,7 @@ class Account:
         return_value = float(return_value.replace('%', ''))
 
         Status = namedtuple("Status","account_val buying_power cash annual_return")
-        portfolio_status = Status(account_val = account_value, buying_power = buying_power_value, cash = cash_value, annual_return = return_value)
+        portfolio_status = Status(account_val=account_value, buying_power=buying_power_value, cash=cash_value, annual_return=return_value)
         return portfolio_status
 
 

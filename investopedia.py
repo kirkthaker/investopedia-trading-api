@@ -28,32 +28,26 @@ class Account:
         # It takes their username & password and returns a handler called br
         # br can then be used to execute trades.
 
-        br = mechanize.Browser()
-        url = "/accounts/login.aspx?returnurl=http://www.investopedia.com/simulator/"
-        br.open(self.url(url))
+        self.br = br = mechanize.Browser()
+        self.go("/accounts/login.aspx?returnurl=http://www.investopedia.com/simulator/")
 
         # you have to select the form before you can input information to it
         # the login form happens to be at nr=2
         br.select_form(nr=2)
-
         br.form["email"] = email
         br.form["password"] = password
-
         br.submit()
 
-        self.br = br
-
-    def url(self, url):
-        return '%s%s' % (self.BASE_URL, url)
+    def go(self, url):
+        url = '%s%s' % (self.BASE_URL, url)
+        return self.br.open(url)
 
     def get_portfolio_status(self):
         # This function takes our mechanize handle and returns:
         # account value, buying power, cash on hand, and annual return
         # Annual return is a percentage, not a decimal
 
-        handle = self.br
-        response = handle.open(self.url('/simulator/portfolio/'))
-
+        response = self.go('/simulator/portfolio/')
         html = response.read()
 
         # The ids of all the account information values
@@ -99,8 +93,8 @@ class Account:
         # See the readme.md file for examples on use and inputs
         # It outputs True if the trade was successful and False if it was not.
 
+        self.go(self.url('/simulator/trade/tradestock.aspx'))
         handle = self.br
-        handle.open(self.url('/simulator/trade/tradestock.aspx'))
         handle.select_form(name="simTrade")
 
         # input order type, quantity, etc.

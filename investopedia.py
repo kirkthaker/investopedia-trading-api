@@ -33,15 +33,14 @@ class Account:
 
         br.submit()
 
-        # return the handle, br, so that we can use it later on for trading, etc.
         self.br = br
 
     def getPortfolioStatus(self):
-        handle = self.br
         # This function takes our mechanize handle and returns:
         # account value, buying power, cash on hand, and annual return
         # Annual return is a percentage, not a decimal
 
+        handle = self.br
         account_url = "http://www.investopedia.com/simulator/portfolio/"
         response = handle.open(account_url)
 
@@ -88,9 +87,7 @@ class Account:
         # See the readme.md file for examples on use and inputs
         # It outputs True if the trade was successful and False if it was not.
 
-        #open the trading page and select the trading form
         handle = self.br
-
         trading_url = "http://www.investopedia.com/simulator/trade/tradestock.aspx"
         handle.open(trading_url)
         handle.select_form(name="simTrade")

@@ -87,8 +87,12 @@ class Account:
         return_value = html[return_begin + len(return_str) + 4:return_end-1]
         return_value = float(return_value.replace('%', ''))
 
-        portfolio_status = Status(account_val=account_value, buying_power=buying_power_value, cash=cash_value, annual_return=return_value)
-        return portfolio_status
+        return Status(
+            account_val=account_value,
+            buying_power=buying_power_value,
+            cash=cash_value,
+            annual_return=return_value,
+        )
 
     def trade(self, symbol, orderType, quantity, priceType="Market", price=False, duration=Duration.good_cancel):
         # This function executes trades on the platform

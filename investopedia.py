@@ -2,6 +2,7 @@ import mechanize
 from enum import Enum
 from collections import namedtuple
 from bs4 import BeautifulSoup
+import re
 
 
 class Action(Enum):
@@ -64,6 +65,14 @@ class Account:
         buying_power = parsed_html.find('span', attrs={'id':buying_power_id}).text
         cash = parsed_html.find('span', attrs={'id':cash_id}).text
         annual_return = parsed_html.find('span', attrs={'id':return_id}).text
+
+        # We want our returned values to be floats
+        # Use regex to remove non-numerical or decimal characters
+        regexp = "[^0-9.]"
+        account_value = float(re.sub(regexp, '', account_value))
+        buying_power = float(re.sub(regexp, '', buying_power))
+        cash = float(re.sub(regexp, '', cash))
+        annual_return = float(re.sub(regexp, '', annual_return))
 
         return Status(
             account_val=account_value,

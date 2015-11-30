@@ -2,7 +2,7 @@
 An API, written in Python, for Investopedia's paper trading stock simulator.
 Pull requests welcome!
 
-# Dependencies
+## Dependencies
 
 For this API to be useful you need an Investopedia trading account,
 which you can make [here](http://www.investopedia.com/simulator/).
@@ -12,7 +12,7 @@ which you can make [here](http://www.investopedia.com/simulator/).
 3. Beautiful Soup. See [here](http://www.crummy.com/software/BeautifulSoup/bs4/doc/).
 
 
-# Usage examples:
+## Usage examples:
 
 Import all the classes:
 ```python

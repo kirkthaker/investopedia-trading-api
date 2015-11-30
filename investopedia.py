@@ -1,6 +1,7 @@
 import mechanize
 from enum import Enum
 from collections import namedtuple
+from bs4 import BeautifulSoup
 
 
 class Action(Enum):

@@ -1,6 +1,8 @@
 import mechanize
 from enum import Enum
 from collections import namedtuple
+from bs4 import BeautifulSoup
+import re
 
 
 class Action(Enum):
@@ -50,43 +52,33 @@ class Account:
 
         response = self.fetch('/simulator/portfolio/')
         html = response.read()
+        parsed_html = BeautifulSoup(html, "html.parser")
 
         # The ids of all the account information values
-        acct_val_str = "ctl00_MainPlaceHolder_currencyFilter_ctrlPortfolioDetails_PortfolioSummary_lblAccountValue"
-        buying_power_str = "ctl00_MainPlaceHolder_currencyFilter_ctrlPortfolioDetails_PortfolioSummary_lblBuyingPower"
-        cash_str = "ctl00_MainPlaceHolder_currencyFilter_ctrlPortfolioDetails_PortfolioSummary_lblCash"
-        return_str = "ctl00_MainPlaceHolder_currencyFilter_ctrlPortfolioDetails_PortfolioSummary_lblAnnualReturn"
-        # The values all end with the HTML tag "span"
-        end_str = "</span>"
+        acct_val_id = "ctl00_MainPlaceHolder_currencyFilter_ctrlPortfolioDetails_PortfolioSummary_lblAccountValue"
+        buying_power_id= "ctl00_MainPlaceHolder_currencyFilter_ctrlPortfolioDetails_PortfolioSummary_lblBuyingPower"
+        cash_id = "ctl00_MainPlaceHolder_currencyFilter_ctrlPortfolioDetails_PortfolioSummary_lblCash"
+        return_id = "ctl00_MainPlaceHolder_currencyFilter_ctrlPortfolioDetails_PortfolioSummary_lblAnnualReturn"
 
-        # Get the beginning and ending points, then simply slice out the string.
-        # Simply use the find function to get the required values
-        # This could probably be more elegant...
-        acct_begin = html.find(acct_val_str)
-        acct_end = html.find(end_str, acct_begin)
-        account_value = html[acct_begin + len(acct_val_str) + 3:acct_end]
-        account_value = float(account_value.replace(',', ''))
+        # Use BeautifulSoup to extract the relevant values based on html ID tags
+        account_value = parsed_html.find('span', attrs={'id':acct_val_id}).text
+        buying_power = parsed_html.find('span', attrs={'id':buying_power_id}).text
+        cash = parsed_html.find('span', attrs={'id':cash_id}).text
+        annual_return = parsed_html.find('span', attrs={'id':return_id}).text
 
-        buying_power_begin = html.find(buying_power_str)
-        buying_power_end = html.find(end_str, buying_power_begin)
-        buying_power_value = html[buying_power_begin + len(buying_power_str) + 3:buying_power_end]
-        buying_power_value = float(buying_power_value.replace(',', ''))
-
-        cash_begin = html.find(cash_str)
-        cash_end = html.find(end_str, cash_begin)
-        cash_value = html[cash_begin + len(cash_str) + 3:cash_end]
-        cash_value = float(cash_value.replace(',', ''))
-
-        return_begin = html.find(return_str)
-        return_end = html.find(end_str, return_begin)
-        return_value = html[return_begin + len(return_str) + 4:return_end-1]
-        return_value = float(return_value.replace('%', ''))
+        # We want our returned values to be floats
+        # Use regex to remove non-numerical or decimal characters
+        regexp = "[^0-9.]"
+        account_value = float(re.sub(regexp, '', account_value))
+        buying_power = float(re.sub(regexp, '', buying_power))
+        cash = float(re.sub(regexp, '', cash))
+        annual_return = float(re.sub(regexp, '', annual_return))
 
         return Status(
             account_val=account_value,
-            buying_power=buying_power_value,
-            cash=cash_value,
-            annual_return=return_value,
+            buying_power=buying_power,
+            cash=cash,
+            annual_return=annual_return,
         )
 
     def trade(self, symbol, orderType, quantity, priceType="Market", price=False, duration=Duration.good_cancel):

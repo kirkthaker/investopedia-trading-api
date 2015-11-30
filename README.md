@@ -2,15 +2,17 @@
 An API, written in Python, for Investopedia's paper trading stock simulator.
 Pull requests welcome!
 
+# Dependencies
+
 For this API to be useful you need an Investopedia trading account,
-and you can make one [here](http://www.investopedia.com/simulator/).
+which you can make [here](http://www.investopedia.com/simulator/).
 
-It also makes extensive use of Python's mechanize library, so you'll need
-to install that as well. See [here](http://wwwsearch.sourceforge.net/mechanize/).
+1. Python's mechanize library. See [here](http://wwwsearch.sourceforge.net/mechanize/).
+2. Backported enum library for Python 2.7. See [here](https://pypi.python.org/pypi/enum34/).
+3. Beautiful Soup. See [here](http://www.crummy.com/software/BeautifulSoup/bs4/doc/).
 
-You'll also need to backported enum library for Python 2.7. See [here](https://pypi.python.org/pypi/enum34/).
 
-Some usage examples:
+# Usage examples:
 
 Import all the classes:
 ```python

@@ -8,7 +8,7 @@ setup(
   author = 'Kirk Thaker',
   author_email = 'kirkthaker66@gmail.com',
   url = 'https://github.com/kirkthaker/investopedia-trading-api',
-  download_url = 'arburl',
+  download_url = 'https://github.com/kirkthaker/investopedia-trading-api/tarball/0.1',
   keywords = ['trading', 'finance', 'investopedia', 'algorithmic'],
   classifiers = [],
 )

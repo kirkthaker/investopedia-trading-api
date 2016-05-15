@@ -33,8 +33,8 @@ class Account:
         self.fetch("/accounts/login.aspx?returnurl=http://www.investopedia.com/simulator/")
 
         # you have to select the form before you can input information to it
-        # the login form happens to be at nr=2
-        br.select_form(nr=2)
+        # the login form used to be at nr=2, now it's at nr=0
+        br.select_form(nr=0)
         br.form["email"] = email
         br.form["password"] = password
         br.submit()

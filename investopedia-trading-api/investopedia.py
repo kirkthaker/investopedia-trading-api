@@ -121,5 +121,8 @@ class Account:
 
         prev_page = br.submit(trade_form, trade_page.url)
         prev_form = prev_page.soup.find("form", {"name":"simTradePreview"})
-        return br.submit(prev_form, prev_page.url)
+        br.submit(prev_form, prev_page.url)
+
+        return True	
+
 

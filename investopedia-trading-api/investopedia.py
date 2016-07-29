@@ -1,9 +1,10 @@
-import mechanize
+import mechanicalsoup
 from enum import Enum
 from collections import namedtuple
-from bs4 import BeautifulSoup
 import re
+import warnings
 
+warnings.filterwarnings("ignore")
 
 class Action(Enum):
     buy = 1
@@ -29,19 +30,20 @@ class Account:
         given a *username* and *password*.
         """
 
-        self.br = br = mechanize.Browser()
-        self.fetch("/accounts/login.aspx?returnurl=http://www.investopedia.com/simulator/")
+        self.br = br = mechanicalsoup.Browser()
+        login_page = self.fetch("/accounts/login.aspx?returnurl=http://www.investopedia.com/simulator/")
 
         # you have to select the form before you can input information to it
         # the login form used to be at nr=2, now it's at nr=0
-        br.select_form(nr=0)
-        br.form["email"] = email
-        br.form["password"] = password
-        br.submit()
+        login_form = login_page.soup.select("form#account-api-form")[0]
+        login_form.select("#edit-email")[0]["value"] = email
+        login_form.select("#edit-password")[0]["value"] = password
+        br.submit(login_form, login_page.url)
+        
 
     def fetch(self, url):
         url = '%s%s' % (self.BASE_URL, url)
-        return self.br.open(url)
+        return self.br.get(url)
 
     def get_portfolio_status(self):
         """
@@ -51,8 +53,8 @@ class Account:
         """
 
         response = self.fetch('/simulator/portfolio/')
-        html = response.read()
-        parsed_html = BeautifulSoup(html, "html.parser")
+
+        parsed_html = response.soup
 
         # The ids of all the account information values
         acct_val_id = "ctl00_MainPlaceHolder_currencyFilter_ctrlPortfolioDetails_PortfolioSummary_lblAccountValue"
@@ -89,33 +91,35 @@ class Account:
         raised.
         """
 
-        self.fetch('/simulator/trade/tradestock.aspx')
-        handle = self.br
-        handle.select_form(name="simTrade")
+        br = self.br
+        trade_page = self.fetch('/simulator/trade/tradestock.aspx')
+        trade_form = trade_page.soup.select("form#orderForm")[0]
 
-        # input order type, quantity, etc.
-        handle.form["symbolTextbox"] = symbol
-        handle.form["quantityTextbox"] = str(quantity)
-        handle.form["transactionTypeDropDown"] = [str(orderType.value)]
-        handle.form["Price"] = [priceType]
-        handle.form["durationTypeDropDown"] = [str(duration.value)]
+        # input symbol, quantity, etc.
+        trade_form.select("input#symbolTextbox")[0]["value"] = symbol
+        trade_form.select("input#quantityTextbox")[0]["value"] = str(quantity)
 
-        # no price to specify - we'll take the market price.
-        if priceType == "Market":
-            handle.submit()
-            handle.select_form(name="simTradePreview")
-            handle.submit()
+        #input transaction type
+        [option.attrs.pop("selected","") for option in trade_form.select("select#transactionTypeDropDown")[0]("option")]
+        trade_form.select("select#transactionTypeDropDown")[0].find("option", {"value":str(orderType.value)})["selected"] = True
+
+        #input price type 
+        [radio.attrs.pop("checked","") for radio in trade_form("input", {"name":"Price"})]
+        trade_form.find("input", {"name":"Price", "value": priceType})["checked"]=True
+
+        #input duration type
+        [option.attrs.pop("selected","") for option in trade_form.select("select#durationTypeDropDown")[0]("option")]
+        trade_form.select("select#durationTypeDropDown")[0].find("option", {"value":str(duration.value)})["selected"] = True
 
         # if a limit or stop order is made, we have to specify the price
-        elif price != False:
-            if priceType == "Limit":
-                handle.form["limitPriceTextBox"] = str(price)
-            elif priceType == "Stop":
-                handle.form["stopPriceTextBox"] = str(price)
-            # submit the form and then submit the "preview order" page that follows
-            # (that's why we have two "submits")
-            handle.submit()
-            handle.select_form(name="simTradePreview")
-            handle.submit()
+        if price and priceType == "Limit":
+            trade_form.select("input#limitPriceTextBox")[0]["value"] = str(price)
 
-        return True
+        elif price and priceType == "Stop":
+            trade_form.select("input#stopPriceTextBox")[0]["value"] = str(price)
+
+
+        prev_page = br.submit(trade_form, trade_page.url)
+        prev_form = prev_page.soup.find("form", {"name":"simTradePreview"})
+        return br.submit(prev_form, prev_page.url)
+

@@ -7,9 +7,7 @@ Pull requests welcome!
 For this API to be useful you need an Investopedia trading account,
 which you can make [here](http://www.investopedia.com/simulator/).
 
-1. Python's mechanize library. See [here](http://wwwsearch.sourceforge.net/mechanize/).
-2. Backported enum library for Python 2.7. See [here](https://pypi.python.org/pypi/enum34/).
-3. Beautiful Soup. See [here](http://www.crummy.com/software/BeautifulSoup/bs4/doc/).
+1. Python's mechanicalsoup library. See [here](https://github.com/hickford/MechanicalSoup/).
 
 
 ## Usage examples:

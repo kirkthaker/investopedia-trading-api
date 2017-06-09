@@ -69,8 +69,8 @@ class Account:
         annual_return = parsed_html.find('span', attrs={'id':return_id}).text
 
         # We want our returned values to be floats
-        # Use regex to remove non-numerical or decimal characters
-        regexp = "[^0-9.]"
+        # Use regex to remove non-numerical or decimal characters, but keep - (negative sign)
+        regexp = "[^0-9.-]"
         account_value = float(re.sub(regexp, '', account_value))
         buying_power = float(re.sub(regexp, '', buying_power))
         cash = float(re.sub(regexp, '', cash))
@@ -83,12 +83,37 @@ class Account:
             annual_return=annual_return,
         )
 
+    def get_portfolio_list(self):
+        """
+        Return ___ Object of the portfolio positions
+        """
+        return False
+
+    def get_open_trades(self):
+        """
+        Return ___ Object of the currently open trades
+        """
+        return False
+
+    def get_quote(symbol):
+        """
+        Returns ____ Object for a price quote of a given symbol through the Investopedia website
+        """
+
+    def get_option_quote(symbol, optionType, strikePrice, expirationDate):
+        """
+        Returns ____ Object for a price quote of a given option through the Investopedia website
+        """
+        
     def trade(self, symbol, orderType, quantity, priceType="Market", price=False, duration=Duration.good_cancel):
         """
         Executes trades on the platform. See the readme.md file
         for examples on use and inputs. Returns True if the
         trade was successful. Else an exception will be
         raised.
+
+        client.trade("GOOG", Action.buy, 10)
+        client.trade("GOOG", Action.buy, 10, "Limit", 500)
         """
 
         br = self.br
@@ -123,6 +148,15 @@ class Account:
         prev_form = prev_page.soup.find("form", {"name":"simTradePreview"})
         br.submit(prev_form, prev_page.url)
 
-        return True	
+        return True
+
+    def trade_option(self, symbol, optionType, strikePrice, expirationDate, quantity, priceType="Market", price=False, duration=Duration.good_cancel)
+        """
+        Executes an option trade
+        client.trade_option("GOOG", Option.buyCall, 950, "2017-06-16", 10)
+        """
+        return False
+
+    
 
 

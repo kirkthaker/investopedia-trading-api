@@ -39,7 +39,6 @@ class Account:
         login_form.select("#edit-email")[0]["value"] = email
         login_form.select("#edit-password")[0]["value"] = password
         br.submit(login_form, login_page.url)
-        
 
     def fetch(self, url):
         url = '%s%s' % (self.BASE_URL, url)
@@ -95,15 +94,10 @@ class Account:
         """
         return False
 
-    def get_quote(symbol):
-        """
-        Returns ____ Object for a price quote of a given symbol through the Investopedia website
-        """
 
-    def get_option_quote(symbol, optionType, strikePrice, expirationDate):
-        """
-        Returns ____ Object for a price quote of a given option through the Investopedia website
-        """
+
+
+
         
     def trade(self, symbol, orderType, quantity, priceType="Market", price=False, duration=Duration.good_cancel):
         """
@@ -150,13 +144,41 @@ class Account:
 
         return True
 
-    def trade_option(self, symbol, optionType, strikePrice, expirationDate, quantity, priceType="Market", price=False, duration=Duration.good_cancel)
+    def trade_option(self, symbol, optionType, strikePrice, expirationDate, quantity, priceType="Market", price=False, duration=Duration.good_cancel):
         """
         Executes an option trade
         client.trade_option("GOOG", Option.buyCall, 950, "2017-06-16", 10)
         """
         return False
 
+
+def get_quote(symbol):
+    BASE_URL = 'http://www.investopedia.com'
+    """
+    Returns the Investopedia delayed price of a given symbol
+    
+    """
+    br = mechanicalsoup.Browser()
+
+    try:
+        response=br.get(BASE_URL+'/markets/stocks/'+symbol.lower())
+    except:
+        print("Security not found.")
+        break
+    quote_id = "quotePrice"
+
+    parsed_html = response.soup
+
+    quote = parsed_html.find('td', attrs={'id': quote_id}).text
+
+    return float(quote)
+
+
+
+def get_option_quote(symbol, optionType, strikePrice, expirationDate):
+    """
+    Returns ____ Object for a price quote of a given option through the Investopedia website
+    """
     
 
 

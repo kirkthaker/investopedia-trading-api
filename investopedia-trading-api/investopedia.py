@@ -102,32 +102,67 @@ class Account:
         # <table id="stock-portfolio-table" class="table1 bdr1">
         # <table id="option-portfolio-table" class="table1 bdr1">
         # <table id="short-portfolio-table" class="table1 ">
-        stockcells = parsed_html.find('table', attrs={'id': "stock-portfolio-table"}).text
-        option_portfolio = parsed_html.find('table', attrs={'id': "option-portfolio-table"}).text
-        short_portfolio = parsed_html.find('table', attrs={'id': "short-portfolio-table"}).text
+        stockTable = parsed_html.find('table', attrs={'id': "stock-portfolio-table"}).text
+        optionTable = parsed_html.find('table', attrs={'id': "option-portfolio-table"}).text
+        shortTable = parsed_html.find('table', attrs={'id': "short-portfolio-table"}).text
+        #the first 20 items are headers and whitespace of the table,
+        #the last 15 items are the totals and whitespace
+        stockTable_trimmed = stockTable.split("\n")[20:-15]
+        optionTable_trimmed = optionTable.split("\n")[20:-15]
+        shortTable_trimmed = shortTable.split("\n")
 
-        stockcells2 = stockcells.split("\n")[20:-15]
         stockportfolio = []
+        optionportfolio = []
+        shortportfolio = []
         i = 0
-        n = 0
-        while i+1 < len(stockcells2):
-            indivstock= Security(
-                symbol=stockcells2[i],
-                description=stockcells2[i+1],
-                quantity=stockcells2[i+2],
-                purchase_price=stockcells2[i+3],
-                current_price=stockcells2[i+4],
-                current_value=stockcells2[i+5],
-                gain_loss=stockcells2[i+7],
+        while i+1 < len(stockTable_trimmed):
+            security= Security(
+                symbol=stockTable_trimmed[i],
+                description=stockTable_trimmed[i+1],
+                quantity=stockTable_trimmed[i+2],
+                purchase_price=stockTable_trimmed[i+3],
+                current_price=stockTable_trimmed[i+4],
+                current_value=stockTable_trimmed[i+5],
+                gain_loss=stockTable_trimmed[i+7],
             )
-            stockportfolio.append(indivstock)
-            i=i+8
-        #return Status(account_val=account_value,buying_power=buying_power,cash=cash,annual_return=annual_return,)
+            stockportfolio.append(security)
+            i=i+8 #need to check how the table is set up for more than one security
+
+        i = 0
+        while i+1 < len(optionTable_trimmed):
+            security = Security(
+                symbol=optionTable_trimmed[i],
+                description=optionTable_trimmed[i+1],
+                quantity=optionTable_trimmed[i+2],
+                purchase_price=optionTable_trimmed[i+3],
+                current_price=optionTable_trimmed[i+4],
+                current_value=optionTable_trimmed[i+5],
+                gain_loss=optionTable_trimmed[i+7],
+            )
+            optionportfolio.append(security)
+            i = i + 8  # need to check how the table is set up for more than one security
+
+        while i+1 < len(optionTable_trimmed): #need to test with shorted stocks
+            security = Security(
+                symbol=shortTable_trimmed[i],
+                description=shortTable_trimmed[i+1],
+                quantity=shortTable_trimmed[i+2],
+                purchase_price=shortTable_trimmed[i+3],
+                current_price=shortTable_trimmed[i+4],
+                current_value=shortTable_trimmed[i+5],
+                gain_loss=shortTable_trimmed[i+7],
+            )
+            shortportfolio.append(security)
+            i = i + 8  # need to check how the table is set up for more than one security
+
         #Security = namedtuple("Security", "symbol description quantity purchase_price current_price current_value gain_loss")
 
 
-        print(stockportfolio) #debug
-        return "Done"
+        return Portfolio(
+            bought=stockportfolio,
+            options=optionportfolio,
+            shorted=shortportfolio
+        )
 
     def get_open_trades(self):
         """

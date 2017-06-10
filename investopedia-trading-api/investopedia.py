@@ -85,9 +85,13 @@ class Account:
 
     def get_current_securites(self):
         """
-        Returns a Securities object containing
-        bought securities and shorted securities
+        Returns a Portfolio object containing
+        bought securities, options, and shorted securities
+        Each of theses are lists of Securities objects containing
+        symbol description quantity purchase_price current_price current_value gain_loss
         """
+        print("getting securities") #debug
+
         response = self.fetch('/simulator/portfolio/')
         parsed_html = response.soup
 
@@ -103,12 +107,26 @@ class Account:
         short_portfolio = parsed_html.find('table', attrs={'id': "short-portfolio-table"}).text
 
         stockcells2 = stockcells.split("\n")[20:-15]
-        indiv_stock = []
-        for i in range(len(stockcells2)):
-            indiv_stock.append(stockcells2[i])
-            if i % 8 = 7:
+        stockportfolio = []
+        i = 0
+        n = 0
+        while i+1 < len(stockcells2):
+            indivstock= Security(
+                symbol=stockcells2[i],
+                description=stockcells2[i+1],
+                quantity=stockcells2[i+2],
+                purchase_price=stockcells2[i+3],
+                current_price=stockcells2[i+4],
+                current_value=stockcells2[i+5],
+                gain_loss=stockcells2[i+7],
+            )
+            stockportfolio.append(indivstock)
+            i=i+8
+        #return Status(account_val=account_value,buying_power=buying_power,cash=cash,annual_return=annual_return,)
+        #Security = namedtuple("Security", "symbol description quantity purchase_price current_price current_value gain_loss")
 
-        print(stock_portfolio)
+
+        print(stockportfolio) #debug
         return "Done"
 
     def get_open_trades(self):

@@ -19,7 +19,8 @@ class Duration(Enum):
 
 
 Status = namedtuple("Status", "account_val buying_power cash annual_return")
-
+Portfolio = namedtuple("Portfolio", "bought options shorted")
+Security = namedtuple("Security", "symbol description quantity purchase_price current_price current_value gain_loss")
 
 class Account:
     BASE_URL = 'http://www.investopedia.com'
@@ -82,11 +83,33 @@ class Account:
             annual_return=annual_return,
         )
 
-    def get_portfolio_list(self):
+    def get_current_securites(self):
         """
-        Return ___ Object of the portfolio positions
+        Returns a Securities object containing
+        bought securities and shorted securities
         """
-        return False
+        response = self.fetch('/simulator/portfolio/')
+        parsed_html = response.soup
+
+        # class that contains the table is "table1 bdr1"
+        # can scrape everything within the table, but we end up
+        # with a lot of unnecessary information
+
+        # <table id="stock-portfolio-table" class="table1 bdr1">
+        # <table id="option-portfolio-table" class="table1 bdr1">
+        # <table id="short-portfolio-table" class="table1 ">
+        stockcells = parsed_html.find('table', attrs={'id': "stock-portfolio-table"}).text
+        option_portfolio = parsed_html.find('table', attrs={'id': "option-portfolio-table"}).text
+        short_portfolio = parsed_html.find('table', attrs={'id': "short-portfolio-table"}).text
+
+        stockcells2 = stockcells.split("\n")[20:-15]
+        indiv_stock = []
+        for i in range(len(stockcells2)):
+            indiv_stock.append(stockcells2[i])
+            if i % 8 = 7:
+
+        print(stock_portfolio)
+        return "Done"
 
     def get_open_trades(self):
         """
@@ -156,21 +179,16 @@ def get_quote(symbol):
     BASE_URL = 'http://www.investopedia.com'
     """
     Returns the Investopedia delayed price of a given symbol
-    
     """
     br = mechanicalsoup.Browser()
-
+    response=br.get(BASE_URL+'/markets/stocks/'+symbol.lower())
+    quote_id = "quotePrice"
+    parsed_html = response.soup
     try:
-        response=br.get(BASE_URL+'/markets/stocks/'+symbol.lower())
+        quote = parsed_html.find('td', attrs={'id': quote_id}).text
     except:
         print("Security not found.")
-        break
-    quote_id = "quotePrice"
-
-    parsed_html = response.soup
-
-    quote = parsed_html.find('td', attrs={'id': quote_id}).text
-
+        return False
     return float(quote)
 
 

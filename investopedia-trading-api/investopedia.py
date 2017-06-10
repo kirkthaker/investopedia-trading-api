@@ -163,17 +163,6 @@ class Account:
             options=optionportfolio,
             shorted=shortportfolio
         )
-
-    def get_open_trades(self):
-        """
-        Return ___ Object of the currently open trades
-        """
-        return False
-
-
-
-
-
         
     def trade(self, symbol, orderType, quantity, priceType="Market", price=False, duration=Duration.good_cancel):
         """
@@ -220,13 +209,6 @@ class Account:
 
         return True
 
-    def trade_option(self, symbol, optionType, strikePrice, expirationDate, quantity, priceType="Market", price=False, duration=Duration.good_cancel):
-        """
-        Executes an option trade
-        client.trade_option("GOOG", Option.buyCall, 950, "2017-06-16", 10)
-        """
-        return False
-
 
 def get_quote(symbol):
     BASE_URL = 'http://www.investopedia.com'
@@ -243,13 +225,3 @@ def get_quote(symbol):
         print("Security not found.")
         return False
     return float(quote)
-
-
-
-def get_option_quote(symbol, optionType, strikePrice, expirationDate):
-    """
-    Returns ____ Object for a price quote of a given option through the Investopedia website
-    """
-    
-
-

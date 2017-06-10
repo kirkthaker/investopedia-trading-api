@@ -21,6 +21,7 @@ class Duration(Enum):
 Status = namedtuple("Status", "account_val buying_power cash annual_return")
 Portfolio = namedtuple("Portfolio", "bought options shorted")
 Security = namedtuple("Security", "symbol description quantity purchase_price current_price current_value gain_loss")
+Trade = namedtuple("Trade", "date_time description symbol quantity")
 
 class Account:
     BASE_URL = 'http://www.investopedia.com'
@@ -90,8 +91,6 @@ class Account:
         Each of theses are lists of Securities objects containing
         symbol description quantity purchase_price current_price current_value gain_loss
         """
-        print("getting securities") #debug
-
         response = self.fetch('/simulator/portfolio/')
         parsed_html = response.soup
 
@@ -163,6 +162,28 @@ class Account:
             options=optionportfolio,
             shorted=shortportfolio
         )
+
+    def get_open_trades(self):
+        """
+        Return ___ Object of the currently open trades
+        """
+        response = self.fetch('/simulator/trade/showopentrades.aspx')
+        parsed_html = response.soup
+
+        openTable = parsed_html.find('table', attrs={'class':'table1'}).text
+        openTable_trimmed = openTable.split("\n")[15:-3]
+        i = 0
+        openTrades = []
+        while i+1 < len(openTable_trimmed):
+            trade = Trade(
+                date_time=openTable_trimmed[i+2],
+                description=openTable_trimmed[i+3],
+                symbol=openTable_trimmed[i+4],
+                quantity=openTable_trimmed[i+5]
+            )
+            openTrades.append(trade)
+            i=i+12
+        return openTrades
         
     def trade(self, symbol, orderType, quantity, priceType="Market", price=False, duration=Duration.good_cancel):
         """

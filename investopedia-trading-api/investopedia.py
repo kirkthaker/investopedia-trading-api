@@ -84,11 +84,11 @@ class Account:
             annual_return=annual_return,
         )
 
-    def get_current_securites(self):
+    def get_current_securities(self):
         """
-        Returns a Portfolio object containing
+        Returns a Portfolio object containing:
         bought securities, options, and shorted securities
-        Each of theses are lists of Securities objects containing
+        Each of theses are lists of Securities objects containing:
         symbol description quantity purchase_price current_price current_value gain_loss
         """
         response = self.fetch('/simulator/portfolio/')
@@ -108,53 +108,80 @@ class Account:
         #the last 15 items are the totals and whitespace
         stockTable_trimmed = stockTable.split("\n")[20:-15]
         optionTable_trimmed = optionTable.split("\n")[20:-15]
-        shortTable_trimmed = shortTable.split("\n")
+        shortTable_trimmed = shortTable.split("\n")[20:-15]
 
         stockportfolio = []
         optionportfolio = []
         shortportfolio = []
+
+        regexp = "[^0-9.-]"
+        
         i = 0
         while i+1 < len(stockTable_trimmed):
+            symbol=stockTable_trimmed[i]
+            description=stockTable_trimmed[i+1]
+            quantity=float(stockTable_trimmed[i+2])
+            purchase_price=float(re.sub(regexp, '', stockTable_trimmed[i+3])) #take off $ sign
+            current_price=float(re.sub(regexp, '', stockTable_trimmed[i+4]))
+            current_value=float(re.sub(regexp, '', stockTable_trimmed[i+5]))
+            gain_loss=round(((current_price - purchase_price)/purchase_price*100),2)
+        
             security= Security(
-                symbol=stockTable_trimmed[i],
-                description=stockTable_trimmed[i+1],
-                quantity=stockTable_trimmed[i+2],
-                purchase_price=stockTable_trimmed[i+3],
-                current_price=stockTable_trimmed[i+4],
-                current_value=stockTable_trimmed[i+5],
-                gain_loss=stockTable_trimmed[i+7],
+                symbol=symbol,
+                description=description,
+                quantity=quantity,
+                purchase_price=purchase_price,
+                current_price=current_price,
+                current_value=current_value,
+                gain_loss=gain_loss
             )
             stockportfolio.append(security)
-            i=i+8 #need to check how the table is set up for more than one security
+            i = i + 18
 
         i = 0
         while i+1 < len(optionTable_trimmed):
+            symbol=optionTable_trimmed[i]
+            description=optionTable_trimmed[i+1]
+            quantity=float(optionTable_trimmed[i+2])
+            purchase_price=float(re.sub(regexp, '', optionTable_trimmed[i+3]))
+            current_price=float(re.sub(regexp, '', optionTable_trimmed[i+4]))
+            current_value=float(re.sub(regexp, '', optionTable_trimmed[i+5]))
+            gain_loss=round(((current_price - purchase_price)/purchase_price*100),2)
+            
             security = Security(
-                symbol=optionTable_trimmed[i],
-                description=optionTable_trimmed[i+1],
-                quantity=optionTable_trimmed[i+2],
-                purchase_price=optionTable_trimmed[i+3],
-                current_price=optionTable_trimmed[i+4],
-                current_value=optionTable_trimmed[i+5],
-                gain_loss=optionTable_trimmed[i+7],
+                symbol=symbol,
+                description=description,
+                quantity=quantity,
+                purchase_price=purchase_price,
+                current_price=current_price,
+                current_value=current_value,
+                gain_loss=gain_loss
             )
             optionportfolio.append(security)
-            i = i + 8  # need to check how the table is set up for more than one security
-
-        while i+1 < len(optionTable_trimmed): #need to test with shorted stocks
+            i = i + 18
+        i=0
+        while i+1 < len(shortTable_trimmed):
+            symbol=shortTable_trimmed[i]
+            description=shortTable_trimmed[i+1]
+            quantity=float(shortTable_trimmed[i+2])
+            purchase_price=float(re.sub(regexp, '', shortTable_trimmed[i+3]))
+            current_price=float(re.sub(regexp, '', shortTable_trimmed[i+4]))
+            current_value=float(re.sub(regexp, '', shortTable_trimmed[i+5]))
+            gain_loss=round(((current_price - purchase_price)/purchase_price*100 *(-1)),2) # shorted securities rise in value if the stockprice falls
+            
             security = Security(
-                symbol=shortTable_trimmed[i],
-                description=shortTable_trimmed[i+1],
-                quantity=shortTable_trimmed[i+2],
-                purchase_price=shortTable_trimmed[i+3],
-                current_price=shortTable_trimmed[i+4],
-                current_value=shortTable_trimmed[i+5],
-                gain_loss=shortTable_trimmed[i+7],
+                symbol=symbol,
+                description=description,
+                quantity=quantity,
+                purchase_price=purchase_price,
+                current_price=current_price,
+                current_value=current_value,
+                gain_loss=gain_loss
             )
             shortportfolio.append(security)
-            i = i + 8  # need to check how the table is set up for more than one security
+            i = i + 18
 
-        #Security = namedtuple("Security", "symbol description quantity purchase_price current_price current_value gain_loss")
+        #Security = namedtuple("Security", "symbol description quantity purchase_price current_price current_value gain_loss(percent)")
 
 
         return Portfolio(
@@ -179,7 +206,7 @@ class Account:
                 date_time=openTable_trimmed[i+2],
                 description=openTable_trimmed[i+3],
                 symbol=openTable_trimmed[i+4],
-                quantity=openTable_trimmed[i+5]
+                quantity=float(openTable_trimmed[i+5])
             )
             openTrades.append(trade)
             i=i+12

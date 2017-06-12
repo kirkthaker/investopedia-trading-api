@@ -1,10 +1,9 @@
 import mechanicalsoup
 from enum import Enum
 from collections import namedtuple
+from bs4 import BeautifulSoup
 import re
-import warnings
 
-# warnings.filterwarnings("ignore")
 
 Status = namedtuple("Status", "account_val buying_power cash annual_return")
 Portfolio = namedtuple("Portfolio", "bought options shorted")
@@ -93,103 +92,14 @@ class Account:
         symbol description quantity purchase_price current_price current_value gain_loss
         """
         response = self.fetch('/simulator/portfolio/')
-        parsed_html = response.soup
+        soup = BeautifulSoup(response.content, "html.parser")
 
-        # class that contains the table is "table1 bdr1"
-        # can scrape everything within the table, but we end up
-        # with a lot of unnecessary information
+        stock_table = soup.find("table", id="stock-portfolio-table").find("tbody")
+        option_table = soup.find("table", id="option-portfolio-table").find("tbody")
+        short_table = soup.find("table", id="short-portfolio-table").find("tbody")
 
-        # <table id="stock-portfolio-table" class="table1 bdr1">
-        # <table id="option-portfolio-table" class="table1 bdr1">
-        # <table id="short-portfolio-table" class="table1 ">
-        stockTable = parsed_html.find('table', attrs={'id': "stock-portfolio-table"}).text
-        optionTable = parsed_html.find('table', attrs={'id': "option-portfolio-table"}).text
-        shortTable = parsed_html.find('table', attrs={'id': "short-portfolio-table"}).text
-        # The first 20 items are headers and whitespace of the table,
-        # The last 15 items are the totals and whitespace
-        stockTable_trimmed = stockTable.split("\n")[20:-15]
-        optionTable_trimmed = optionTable.split("\n")[20:-15]
-        shortTable_trimmed = shortTable.split("\n")[20:-15]
+        print(stock_table.find_all("tr"))
 
-        stockportfolio = []
-        optionportfolio = []
-        shortportfolio = []
-
-        regexp = "[^0-9.-]"
-
-        i = 0
-        while i + 1 < len(stockTable_trimmed):
-            symbol = stockTable_trimmed[i]
-            description = stockTable_trimmed[i + 1]
-            quantity = float(stockTable_trimmed[i + 2])
-            purchase_price = float(re.sub(regexp, '', stockTable_trimmed[i + 3]))  # Take off $ sign
-            current_price = float(re.sub(regexp, '', stockTable_trimmed[i + 4]))
-            current_value = float(re.sub(regexp, '', stockTable_trimmed[i + 5]))
-            gain_loss = round(((current_price - purchase_price) / purchase_price*100), 2)
-
-            security = Security(
-                symbol=symbol,
-                description=description,
-                quantity=quantity,
-                purchase_price=purchase_price,
-                current_price=current_price,
-                current_value=current_value,
-                gain_loss=gain_loss
-            )
-            stockportfolio.append(security)
-            i = i + 18
-
-        i = 0
-        while i+1 < len(optionTable_trimmed):
-            symbol=optionTable_trimmed[i]
-            description=optionTable_trimmed[i+1]
-            quantity=float(optionTable_trimmed[i+2])
-            purchase_price=float(re.sub(regexp, '', optionTable_trimmed[i+3]))
-            current_price=float(re.sub(regexp, '', optionTable_trimmed[i+4]))
-            current_value=float(re.sub(regexp, '', optionTable_trimmed[i+5]))
-            gain_loss=round(((current_price - purchase_price)/purchase_price*100),2)
-
-            security = Security(
-                symbol=symbol,
-                description=description,
-                quantity=quantity,
-                purchase_price=purchase_price,
-                current_price=current_price,
-                current_value=current_value,
-                gain_loss=gain_loss
-            )
-            optionportfolio.append(security)
-            i = i + 18
-        i=0
-        while i+1 < len(shortTable_trimmed):
-            symbol=shortTable_trimmed[i]
-            description=shortTable_trimmed[i+1]
-            quantity=float(shortTable_trimmed[i+2])
-            purchase_price=float(re.sub(regexp, '', shortTable_trimmed[i+3]))
-            current_price=float(re.sub(regexp, '', shortTable_trimmed[i+4]))
-            current_value=float(re.sub(regexp, '', shortTable_trimmed[i+5]))
-            gain_loss=round(((current_price - purchase_price)/purchase_price*100 *(-1)),2) # shorted securities rise in value if the stockprice falls
-
-            security = Security(
-                symbol=symbol,
-                description=description,
-                quantity=quantity,
-                purchase_price=purchase_price,
-                current_price=current_price,
-                current_value=current_value,
-                gain_loss=gain_loss
-            )
-            shortportfolio.append(security)
-            i = i + 18
-
-        # Security = namedtuple("Security", "symbol description quantity purchase_price current_price current_value gain_loss(percent)")
-
-
-        return Portfolio(
-            bought=stockportfolio,
-            options=optionportfolio,
-            shorted=shortportfolio
-        )
 
     def get_open_trades(self):
         """
@@ -240,7 +150,7 @@ class Account:
         [radio.attrs.pop("checked","") for radio in trade_form("input", {"name":"Price"})]
         trade_form.find("input", {"name":"Price", "value": priceType})["checked"]=True
 
-        #input duration type
+        # input duration type
         [option.attrs.pop("selected","") for option in trade_form.select("select#durationTypeDropDown")[0]("option")]
         trade_form.select("select#durationTypeDropDown")[0].find("option", {"value":str(duration.value)})["selected"] = True
 

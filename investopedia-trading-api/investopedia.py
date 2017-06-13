@@ -7,7 +7,7 @@ import re
 
 Status = namedtuple("Status", "account_val buying_power cash annual_return")
 Portfolio = namedtuple("Portfolio", "bought options shorted")
-Security = namedtuple("Security", "symbol description quantity purchase_price current_price current_value gain_loss")
+Security = namedtuple("Security", "symbol description quantity purchase_price current_price current_value")
 Trade = namedtuple("Trade", "date_time description symbol quantity")
 
 
@@ -98,8 +98,72 @@ class Account:
         option_table = soup.find("table", id="option-portfolio-table").find("tbody")
         short_table = soup.find("table", id="short-portfolio-table").find("tbody")
 
-        print(stock_table.find_all("tr"))
+        if stock_table is not None:
+            stock_list = stock_table.find_all("tr")[:-1]
+            stock_list = [s.find_all("td")[-8:-2] for s in stock_list]
+        else:
+            stock_list = []
 
+        if option_table is not None:
+            option_list = option_table.find_all("tr")[:-1]
+            option_list = [o.find_all("td")[-8:-2] for o in option_list]
+        else:
+            option_list = []
+
+        if short_table is not None:
+            short_list = short_table.find_all("tr")[:-1]
+            short_list = [s.find_all("td")[-8:-2] for s in short_list]
+        else:
+            short_list = []
+
+        bought = []
+        options = []
+        shorted = []
+
+        for stock_data in stock_list:
+            stock_data_text = [s.getText() for s in stock_data]
+            if len(stock_data_text) == 6:
+                sec = Security(
+                    symbol=stock_data_text[0],
+                    description=stock_data_text[1],
+                    quantity=int(stock_data_text[2]),
+                    purchase_price=float(stock_data_text[3][1:].replace(",", "")),
+                    current_price=float(stock_data_text[4][1:].replace(",", "")),
+                    current_value=float(stock_data_text[5][1:].replace(",", ""))
+                )
+                bought.append(sec)
+
+        for option_data in option_list:
+            option_data_text = [o.getText() for o in option_data]
+            if len(option_data_text) == 6:
+                sec = Security(
+                    symbol=option_data_text[0],
+                    description=option_data_text[1],
+                    quantity=int(option_data_text[2]),
+                    purchase_price=float(option_data_text[3][1:].replace(",", "")),
+                    current_price=float(option_data_text[4][1:].replace(",", "")),
+                    current_value=float(option_data_text[5][1:].replace(",", ""))
+                )
+                options.append(sec)
+
+        for short_data in short_list:
+            short_data_text = [s.getText() for s in short_data]
+            if len(short_data_text) == 6:
+                sec = Security(
+                    symbol=short_data_text[0],
+                    description=short_data_text[1],
+                    quantity=int(short_data_text[2]),
+                    purchase_price=float(short_data_text[3][1:].replace(",", "")),
+                    current_price=float(short_data_text[4][1:].replace(",", "")),
+                    current_value=float(short_data_text[5][1:].replace(",", ""))
+                )
+                shorted.append(sec)
+
+        return Portfolio(
+            bought=bought,
+            options=options,
+            shorted=shorted
+        )
 
     def get_open_trades(self):
         """
@@ -171,15 +235,16 @@ class Account:
 def get_quote(symbol):
     BASE_URL = 'http://www.investopedia.com'
     """
-    Returns the Investopedia delayed price of a given symbol
+    Returns the Investopedia-delayed price of a given security,
+    represented by its stock symbol, a string. Returns false if
+    security not found or if another error occurs.
     """
     br = mechanicalsoup.Browser()
-    response = br.get(BASE_URL + '/markets/stocks/'+symbol.lower())
+    response = br.get(BASE_URL + '/markets/stocks/' + symbol.lower())
     quote_id = "quotePrice"
     parsed_html = response.soup
     try:
         quote = parsed_html.find('td', attrs={'id': quote_id}).text
     except:
-        print("Security not found.")
         return False
     return float(quote)

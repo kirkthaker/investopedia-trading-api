@@ -107,7 +107,7 @@ class Account:
             handle.submit()
 
         # if a limit or stop order is made, we have to specify the price
-        elif price != False:
+        elif price is not False:
             if priceType == "Limit":
                 handle.form["limitPriceTextBox"] = str(price)
             elif priceType == "Stop":

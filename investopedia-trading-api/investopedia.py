@@ -70,7 +70,8 @@ class Account:
         annual_return = parsed_html.find('span', attrs={'id': return_id}).text
 
         # We want our returned values to be floats
-        # Use regex to remove non-numerical or decimal characters, but keep - (negative sign)
+        # Use regex to remove non-numerical or decimal characters
+        # But keep - (negative sign)
         regexp = "[^0-9.-]"
         account_value = float(re.sub(regexp, '', account_value))
         buying_power = float(re.sub(regexp, '', buying_power))
@@ -167,25 +168,35 @@ class Account:
 
     def get_open_trades(self):
         """
-        Return ___ Object of the currently open trades
+        Return a list of Trade objects that represent open trades (orders
+        that have been made but not yet fulfilled).
         """
         response = self.fetch('/simulator/trade/showopentrades.aspx')
-        parsed_html = response.soup
+        soup = BeautifulSoup(response.content, "html.parser")
 
-        openTable = parsed_html.find('table', attrs={'class':'table1'}).text
-        openTable_trimmed = openTable.split("\n")[15:-3]
-        i = 0
-        openTrades = []
-        while i+1 < len(openTable_trimmed):
-            trade = Trade(
-                date_time=openTable_trimmed[i+2],
-                description=openTable_trimmed[i+3],
-                symbol=openTable_trimmed[i+4],
-                quantity=float(openTable_trimmed[i+5])
+        # Case: No pending trades
+        if soup.find("table", class_="table1") is None:
+            return []
+
+        open_trades_table = soup.find("table", class_="table1").find("tbody")
+        open_trades_list = open_trades_table.find_all("tr", class_="table_data")
+
+        open_trades_raw = []
+        for open_trade in open_trades_list:
+            trade_info_list = open_trade.find_all("td")
+            open_trades_raw.append([i.getText() for i in trade_info_list][2:6])
+
+        open_trades = []
+        for raw_data in open_trades_raw:
+            trade_obj = Trade(
+                date_time=raw_data[0],
+                description=raw_data[1],
+                symbol=raw_data[2],
+                quantity=int(raw_data[3])
             )
-            openTrades.append(trade)
-            i=i+12
-        return openTrades
+            open_trades.append(trade_obj)
+
+        return open_trades
 
     def trade(self, symbol, orderType, quantity, priceType="Market", price=False, duration=Duration.good_cancel):
         """

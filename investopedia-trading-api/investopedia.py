@@ -218,16 +218,16 @@ class Account:
         trade_form.select("input#quantityTextbox")[0]["value"] = str(quantity)
 
         # input transaction type
-        [option.attrs.pop("selected","") for option in trade_form.select("select#transactionTypeDropDown")[0]("option")]
-        trade_form.select("select#transactionTypeDropDown")[0].find("option", {"value":str(orderType.value)})["selected"] = True
+        [option.attrs.pop("selected", "") for option in trade_form.select("select#transactionTypeDropDown")[0]("option")]
+        trade_form.select("select#transactionTypeDropDown")[0].find("option", {"value": str(orderType.value)})["selected"] = True
 
         # input price type
-        [radio.attrs.pop("checked","") for radio in trade_form("input", {"name":"Price"})]
-        trade_form.find("input", {"name":"Price", "value": priceType})["checked"]=True
+        [radio.attrs.pop("checked", "") for radio in trade_form("input", {"name": "Price"})]
+        trade_form.find("input", {"name": "Price", "value": priceType})["checked"] = True
 
         # input duration type
-        [option.attrs.pop("selected","") for option in trade_form.select("select#durationTypeDropDown")[0]("option")]
-        trade_form.select("select#durationTypeDropDown")[0].find("option", {"value":str(duration.value)})["selected"] = True
+        [option.attrs.pop("selected", "") for option in trade_form.select("select#durationTypeDropDown")[0]("option")]
+        trade_form.select("select#durationTypeDropDown")[0].find("option", {"value": str(duration.value)})["selected"] = True
 
         # if a limit or stop order is made, we have to specify the price
         if price and priceType == "Limit":

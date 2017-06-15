@@ -22,6 +22,10 @@ class Duration(Enum):
     day_order = 1
     good_cancel = 2
 
+class Option(Enum):
+    call = 1
+    put = 2
+
 
 class Account:
     BASE_URL = 'http://www.investopedia.com'
@@ -238,6 +242,69 @@ class Account:
 
         prev_page = br.submit(trade_form, trade_page.url)
         prev_form = prev_page.soup.find("form", {"name": "simTradePreview"})
+        #br.submit(prev_form, prev_page.url)
+
+        return True
+
+    def trade_option(self, symbol, orderType, optionType, strike_price,expire_date, quantity, priceType="Market", price=False, duration=Duration.good_cancel):
+        """
+        Executes option trades on the platform. Returns True if the
+        trade was successful. Else an exception will be
+        raised.
+
+        Expire Date as YYMMDD
+
+        client.trade_option("GOOG", Action.buy, "Call", 932.50, 170616, 10)
+        client.trade_option("GOOG", Action.buy, "Put", 932.50, 170616, 10, "Limit", 6.25)
+        """
+        # http://www.investopedia.com/simulator/trade/TradeOptions.aspx?sym=GOOG1716F945&s=945&msym=GOOG
+        # GOOG1716F945
+        # expire_date as YYMMDD
+        # option_symbol = stock_symbol+YY+DD+M(in letter, corresponding to month and put/call)+strike
+        # Option symbols are encoded with a letter that corresponds to the month and if it is a call or put
+        if optionType == "Call":
+            month_letter = "ABCDEFGHIJKL"[int(str(expire_date)[3:4])-1]
+        elif optionType == "Put":
+            month_letter = "MNOPQRSTUVWX"[int(str(expire_date)[3:4])-1]
+
+        option_symbol = symbol+str(expire_date)[0:2]+str(expire_date)[4:6]+month_letter+str(strike_price)
+
+        # Investopedia requires all these Query Strings for the order form to be valid
+        option_page = '/simulator/trade/TradeOptions.aspx?sym='+option_symbol+'&s='+str(strike_price)+'&msym='+symbol
+        br = self.br
+        trade_page = self.fetch(option_page)
+        trade_form = trade_page.soup.select("form#aspnetForm")[0]
+
+        # input symbol, quantity, etc.
+        trade_form.select("input#txtNumContracts")[0]["value"] = str(quantity)
+
+        # input transaction type
+        # class Action(Enum):
+        #     buy = 1
+        #     sell = 2
+        #     short = 3
+        #     cover = 4
+        [option.attrs.pop("selected", "") for option in trade_form.select("select#ddlAction")[0]("option")]
+        trade_form.select("select#ddlAction")[0].find("option", {"value": str(orderType.value)})["selected"] = True
+
+        # input price type ***good
+        [radio.attrs.pop("checked", "") for radio in trade_form("input", {"name": "Price"})]
+        trade_form.find("input", {"name": "Price", "value": priceType})["checked"] = True
+
+        # input duration type ***good
+        [option.attrs.pop("selected", "") for option in trade_form.select("select#durationTypeDropDown")[0]("option")]
+        trade_form.select("select#durationTypeDropDown")[0].find("option", {"value": str(duration.value)})["selected"] = True
+
+        # if a limit or stop order is made, we have to specify the price
+        if price and priceType == "Limit":
+            trade_form.select("input#limitPriceTextBox")[0]["value"] = str(price)
+
+        elif price and priceType == "Stop":
+            trade_form.select("input#stopPriceTextBox")[0]["value"] = str(price)
+
+
+        prev_page = br.submit(trade_form, trade_page.url)
+        prev_form = prev_page.soup.find("form", {"name": "simOptTradePreview"})
         br.submit(prev_form, prev_page.url)
 
         return True

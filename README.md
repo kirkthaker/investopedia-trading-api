@@ -1,52 +1,124 @@
 # investopedia-trading-api
 An API, written in Python, for Investopedia's paper trading stock simulator.
-Pull requests welcome!
+Pull requests welcome.
 
-## Dependencies
+This library is now Python 3 compatible!
+
+## Installation
 
 For this API to be useful you need an Investopedia trading account,
 which you can make [here](http://www.investopedia.com/simulator/).
 
-1. Python's mechanicalsoup library. See [here](https://github.com/hickford/MechanicalSoup/).
+You can install the library with pip:
 
+`pip install InvestopediaApi`
 
-## Usage examples:
+## Documentation and examples:
 
-Import all the classes:
+Importing everything:
 ```python
-from investopedia import *
+from InvestopediaApi import ita
 ```
+
+`ita` is the name of the file that contains everything of relevance for interacting with Investopedia.
+
+The main class is `Account`, which logs you into the simulator upon instantiation.
 
 Log into the simulator:
 ```python
-client = Account("emailaddress","password")
+from InvestopediaApi import ita
+client = ita.Account("emailaddress", "password")
 ```
 
-Get account status (cash on hand, annual return, etc.):
+Currently, Investopedia Api has 4 "meta" functions:
+1. `ita.Account.get_portfolio_status`
+2. `ita.Account.get_current_securities`
+3. `ita.Account.get_open_trades`
+4. `ita.get_quote`
+
+`get_portfolio_status` returns a named tuple with 4 elements: account_val, buying_power, cash, and annual_return.
+
+
 ```python
+from InvestopediaApi import ita
+
+client = ita.Account("email", "password")
+
 status = client.get_portfolio_status()
-print status.account_val
-print status.buying_power
-print status.cash
-print status.annual_return
+print(status.account_val)
+print(status.buying_power)
+print(status.cash)
+print(status.annual_return)
 ```
+
+
+`get_current_securities` returns a list of securities the user currently owns, represented by a list of Security namedtuple objects. Each object has the following elements: symbol, description, quantity, purchase_price, current_price, and current_value.
+
+
+```python
+from InvestopediaApi import ita
+
+client = ita.Account("email", "password")
+
+securities_owned = client.get_current_securities()
+
+for sec in securities_owned:
+    # You get the idea...
+    print(sec.symbol)
+    print(sec.description)
+    # etc.
+```
+
+
+`get_open_trades` returns a list of "open" trades - that is, trades that have been made but not yet executed by the Investopedia platform. It returns a list of Trade namedtuple objects which have the following elements: date_time, description, symbol, and quantity.
+
+```python
+from InvestopediaApi import ita
+
+client = ita.Account("email", "password")
+
+open_trades = client.get_open_trades()
+
+for open_trade in open_trades:
+    print(open_trade.date_time)
+    print(open_trade.description)
+    print(open_trade.symbol)
+    print(open_trade.quantity)
+```
+
+`get_quote` returns the price of a security given its symbol. Unlike the other 3 meta functions, this is not part of the Account class. Returns false if the security is not found or another error occurs.
+
+```python
+from InvestopediaApi import ita
+
+client = ita.Account("email", "password")
+print(ita.get_quote("GOOG"))
+```
+
+### Making trades
+
+Of course, the most important function in this API is the `trade` function. This takes, at minimum, a security symbol (string), an orderType (Action class), and a quantity (integer).
+
+The `trade` function is best illustrated with examples:
 
 Buying 10 shares of Google (GOOG) at market price:
 ```python
-client.trade("GOOG", Action.buy, 10)
+client.trade("GOOG", ita.Action.buy, 10)
 ```
 
 Selling 10 shares of Google at market price:
 ```python
-client.trade("GOOG", Action.sell, 10)
+client.trade("GOOG", ita.Action.sell, 10)
 ```
 
 Shorting 10 shares of Google:
 ```python
-client.trade("GOOG", Action.short, 10)
+client.trade("GOOG", ita.Action.short, 10)
 ```
 
 Buying 10 shares of Google with a limit order at $500
 ```python
-client.trade("GOOG", Action.buy, 10, "Limit", 500)
+client.trade("GOOG", ita.Action.buy, 10, "Limit", 500)
 ```
+
+You can browse through the code (it's only in one file) to get a more thorough understanding of the possibilities.

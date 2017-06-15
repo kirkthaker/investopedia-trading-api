@@ -1,12 +1,12 @@
 Metadata-Version: 1.1
-Name: InvestopediaTradingApi
-Version: 1.0
+Name: InvestopediaApi
+Version: 1.1
 Summary: An API for Investopedia's paper trading simulator
 Home-page: https://github.com/kirkthaker/investopedia-trading-api
 Author: Kirk Thaker
 Author-email: kirkthaker66@gmail.com
 License: UNKNOWN
-Download-URL: https://github.com/kirkthaker/investopedia-trading-api/tarball/1.0
+Download-URL: https://github.com/kirkthaker/investopedia-trading-api/archive/1.1.tar.gz
 Description: UNKNOWN
 Keywords: trading,finance,investopedia,algorithmic
 Platform: UNKNOWN

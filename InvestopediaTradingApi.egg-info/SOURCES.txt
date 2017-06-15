@@ -1,8 +1,0 @@
-setup.cfg
-setup.py
-InvestopediaTradingApi/investopedia.py
-InvestopediaTradingApi.egg-info/PKG-INFO
-InvestopediaTradingApi.egg-info/SOURCES.txt
-InvestopediaTradingApi.egg-info/dependency_links.txt
-InvestopediaTradingApi.egg-info/requires.txt
-InvestopediaTradingApi.egg-info/top_level.txt

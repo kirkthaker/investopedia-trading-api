@@ -1,8 +1,8 @@
-from setuptools import setup, find_packages 
+from setuptools import setup, find_packages
 
 setup(
-  name = 'investopedia-trading-api',
-  packages = ['investopedia-trading-api'],
+  name = 'InvestopediaTradingApi',
+  packages = ['InvestopediaTradingApi'],
   version = '1.0',
   description = 'An API for Investopedia\'s paper trading simulator',
   author = 'Kirk Thaker',

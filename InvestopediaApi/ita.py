@@ -25,7 +25,7 @@ class Duration(Enum):
 class Account:
     BASE_URL = 'http://www.investopedia.com'
 
-    def __init__(self, email, password):
+    def __init__(self, email, password,competition_number):
         """
         Logs a user into Investopedia's trading simulator,
         given a *username* and *password*.
@@ -39,7 +39,19 @@ class Account:
         login_form = login_page.soup.select("form#account-api-form")[0]
         login_form.select("#edit-email")[0]["value"] = email
         login_form.select("#edit-password")[0]["value"] = password
-        br.submit(login_form, login_page.url)
+        home_page = br.submit(login_form, login_page.url)
+
+        # select competition to use
+        competition_form = home_page.soup.select("form#ddlGamesJoinedForm")[0]
+        #print(competition_form)
+        #print(competition_form.select("select#edit-salutation"))
+        [option.attrs.pop("selected", "") for option in competition_form.select("select#edit-salutation")[0]("option")]
+        #competition_form.select("select#edit-salutation")[0][competition_number] = True
+        #competition_form.select("select#edit-salutation")[0].find("option")[competition_number]["selected"] = True
+        #print(competition_form.select("select#edit-salutation")[0])
+        #print(competition_form.select("select#edit-salutation")[0].find("option"))
+        competition_form.select("select#edit-salutation")[0].find("option", {"value": str(competition_number)})["selected"] = True
+        br.submit(competition_form, home_page.url)
 
     def fetch(self, url):
         url = '%s%s' % (self.BASE_URL, url)
@@ -235,9 +247,11 @@ class Account:
         elif price and priceType == "Stop":
             trade_form.select("input#stopPriceTextBox")[0]["value"] = str(price)
 
+        print(trade_form)
         prev_page = br.submit(trade_form, trade_page.url)
         prev_form = prev_page.soup.find("form", {"name": "simTradePreview"})
-        #br.submit(prev_form, prev_page.url)
+
+        br.submit(prev_form, prev_page.url)
 
         return True
 

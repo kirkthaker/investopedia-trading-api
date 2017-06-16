@@ -22,11 +22,6 @@ class Duration(Enum):
     day_order = 1
     good_cancel = 2
 
-class Option(Enum):
-    call = 1
-    put = 2
-
-
 class Account:
     BASE_URL = 'http://www.investopedia.com'
 
@@ -269,7 +264,7 @@ class Account:
 
         option_symbol = symbol+str(expire_date)[0:2]+str(expire_date)[4:6]+month_letter+str(strike_price)
 
-        # Investopedia requires all these Query Strings for the order form to be valid
+        # Investopedia requires these 3 Query Strings for the order form page to be valid
         option_page = '/simulator/trade/TradeOptions.aspx?sym='+option_symbol+'&s='+str(strike_price)+'&msym='+symbol
         br = self.br
         trade_page = self.fetch(option_page)
@@ -279,11 +274,6 @@ class Account:
         trade_form.select("input#txtNumContracts")[0]["value"] = str(quantity)
 
         # input transaction type
-        # class Action(Enum):
-        #     buy = 1
-        #     sell = 2
-        #     short = 3
-        #     cover = 4
         [option.attrs.pop("selected", "") for option in trade_form.select("select#ddlAction")[0]("option")]
         trade_form.select("select#ddlAction")[0].find("option", {"value": str(orderType.value)})["selected"] = True
 
@@ -301,7 +291,6 @@ class Account:
 
         elif price and priceType == "Stop":
             trade_form.select("input#stopPriceTextBox")[0]["value"] = str(price)
-
 
         prev_page = br.submit(trade_form, trade_page.url)
         prev_form = prev_page.soup.find("form", {"name": "simOptTradePreview"})

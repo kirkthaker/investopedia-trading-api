@@ -25,10 +25,15 @@ class Duration(Enum):
 class Account:
     BASE_URL = 'http://www.investopedia.com'
 
-    def __init__(self, email, password,competition_number):
+    def __init__(self, email, password, competition_number=0):
         """
         Logs a user into Investopedia's trading simulator,
-        given a *username* and *password*.
+        and chooses a competition
+        given a *username*, *password*, and *competition_number*
+
+        *competition_number* is the position of the desired game
+        in the dropdown box on http://www.investopedia.com/simulator/home.aspx
+        starting at 0. Default = 0
         """
 
         self.br = br = mechanicalsoup.Browser()
@@ -43,14 +48,8 @@ class Account:
 
         # select competition to use
         competition_form = home_page.soup.select("form#ddlGamesJoinedForm")[0]
-        #print(competition_form)
-        #print(competition_form.select("select#edit-salutation"))
         [option.attrs.pop("selected", "") for option in competition_form.select("select#edit-salutation")[0]("option")]
-        #competition_form.select("select#edit-salutation")[0][competition_number] = True
-        #competition_form.select("select#edit-salutation")[0].find("option")[competition_number]["selected"] = True
-        #print(competition_form.select("select#edit-salutation")[0])
-        #print(competition_form.select("select#edit-salutation")[0].find("option"))
-        competition_form.select("select#edit-salutation")[0].find("option", {"value": str(competition_number)})["selected"] = True
+        competition_form.select("select#edit-salutation")[0].find_all("option")[competition_number]["selected"] = True
         br.submit(competition_form, home_page.url)
 
     def fetch(self, url):
@@ -247,7 +246,6 @@ class Account:
         elif price and priceType == "Stop":
             trade_form.select("input#stopPriceTextBox")[0]["value"] = str(price)
 
-        print(trade_form)
         prev_page = br.submit(trade_form, trade_page.url)
         prev_form = prev_page.soup.find("form", {"name": "simTradePreview"})
 

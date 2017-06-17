@@ -52,23 +52,35 @@ print(status.annual_return)
 ```
 
 
-`get_current_securities` returns a list of securities the user currently owns, represented by a list of Security namedtuple objects. Each object has the following elements: symbol, description, quantity, purchase_price, current_price, and current_value.
+`get_current_securities` returns a Portfolio object with 3 attributes:
+bought, shorted, and options. Each of those is a list of Security objects
+with the following attributes:
+symbol, description, quantity, purchase_price, current_price, current_value, and gain_loss
 
 
 ```python
-from InvestopediaApi import ita
+from Investopedia import ita
 
 client = ita.Account("email", "password")
 
-securities_owned = client.get_current_securities()
+portfolio = client.get_current_securities()
 
-for sec in securities_owned:
-    # You get the idea...
-    print(sec.symbol)
-    print(sec.description)
+# Portfolio is not a list, it is a namedtuple object with 3 attributes: bought, shorted, options.
+# Each of bought, shorted, and options is a list of Security objects, which have attributes
+# symbol, description, quantity, purchase_price, current_price, current_value, and gain_loss
+
+bought_securities = portfolio.bought
+shorted_securities = portfolio.shorted
+options = portfolio.options
+
+for bought in bought_securities:
+    print(bought.symbol)
+    print(bought.description)
+    print(bought.purchase_price)
     # etc.
-```
 
+# Repeat above loop for shorted securities and options
+```
 
 `get_open_trades` returns a list of "open" trades - that is, trades that have been made but not yet executed by the Investopedia platform. It returns a list of Trade namedtuple objects which have the following elements: date_time, description, symbol, and quantity.
 

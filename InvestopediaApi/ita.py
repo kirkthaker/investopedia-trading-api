@@ -22,6 +22,7 @@ class Duration(Enum):
     day_order = 1
     good_cancel = 2
 
+
 class Account:
     BASE_URL = 'http://www.investopedia.com'
 
@@ -253,7 +254,7 @@ class Account:
 
         return True
 
-    def trade_option(self, symbol, orderType, optionType, strike_price,expire_date, quantity, priceType="Market", price=False, duration=Duration.good_cancel):
+    def trade_option(self, symbol, orderType, optionType, strike_price, expire_date, quantity, priceType="Market", price=False, duration=Duration.good_cancel):
         """
         Executes option trades on the platform. Returns True if the
         trade was successful. Else an exception will be
@@ -270,14 +271,14 @@ class Account:
         # option_symbol = stock_symbol+YY+DD+M(in letter, corresponding to month and put/call)+strike
         # Option symbols are encoded with a letter that corresponds to the month and if it is a call or put
         if optionType == "Call":
-            month_letter = "ABCDEFGHIJKL"[int(str(expire_date)[3:4])-1]
+            month_letter = "ABCDEFGHIJKL"[int(str(expire_date)[3:4]) - 1]
         elif optionType == "Put":
-            month_letter = "MNOPQRSTUVWX"[int(str(expire_date)[3:4])-1]
+            month_letter = "MNOPQRSTUVWX"[int(str(expire_date)[3:4]) - 1]
 
-        option_symbol = symbol+str(expire_date)[0:2]+str(expire_date)[4:6]+month_letter+str(strike_price)
+        option_symbol = symbol + str(expire_date)[0:2] + str(expire_date)[4:6] + month_letter + str(strike_price)
 
         # Investopedia requires these 3 Query Strings for the order form page to be valid
-        option_page = '/simulator/trade/TradeOptions.aspx?sym='+option_symbol+'&s='+str(strike_price)+'&msym='+symbol
+        option_page = '/simulator/trade/TradeOptions.aspx?sym=' + option_symbol + '&s=' + str(strike_price) + '&msym=' + symbol
         br = self.br
         trade_page = self.fetch(option_page)
         trade_form = trade_page.soup.select("form#aspnetForm")[0]

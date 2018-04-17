@@ -11,6 +11,14 @@ Security = namedtuple("Security", "symbol description quantity purchase_price cu
 Trade = namedtuple("Trade", "date_time description symbol quantity")
 
 
+class LoginError(Exception):
+    """Exception raised for errors logging into Investopedia
+
+    """
+    def __init__(self):
+        super().__init__("Login Error: Invalid Username or Password")
+
+
 class Action(Enum):
     buy = 1
     sell = 2
@@ -25,6 +33,7 @@ class Duration(Enum):
 
 class Account:
     BASE_URL = 'https://www.investopedia.com'
+    logged_in = False
 
     def __init__(self, email, password, competition_number=0):
         """
@@ -48,10 +57,14 @@ class Account:
         home_page = br.submit(login_form, login_page.url)
 
         # select competition to use
-        competition_form = home_page.soup.select("form#ddlGamesJoinedForm")[0]
-        [option.attrs.pop("selected", "") for option in competition_form.select("select#edit-salutation")[0]("option")]
-        competition_form.select("select#edit-salutation")[0].find_all("option")[competition_number]["selected"] = True
-        br.submit(competition_form, home_page.url)
+        try:
+            competition_form = home_page.soup.select("form#ddlGamesJoinedForm")[0]
+            [option.attrs.pop("selected", "") for option in competition_form.select("select#edit-salutation")[0]("option")]
+            competition_form.select("select#edit-salutation")[0].find_all("option")[competition_number]["selected"] = True
+            br.submit(competition_form, home_page.url)
+            self.logged_in = True
+        except IndexError:
+            raise LoginError
 
     def fetch(self, url):
         url = '%s%s' % (self.BASE_URL, url)

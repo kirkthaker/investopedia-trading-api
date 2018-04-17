@@ -32,10 +32,10 @@ class Duration(Enum):
 
 
 class Account:
-    BASE_URL = 'https://www.investopedia.com'
+    BASE_URL = 'http://www.investopedia.com'
     logged_in = False
 
-    def __init__(self, email, password, competition_number=0):
+    def __init__(self, email, password, competition_number=0, https=False):
         """
         Logs a user into Investopedia's trading simulator,
         and chooses a competition
@@ -45,6 +45,9 @@ class Account:
         in the dropdown box on http://www.investopedia.com/simulator/home.aspx
         starting at 0. Default = 0
         """
+
+        if https:
+            self.BASE_URL = 'https://www.investopedia.com'
 
         self.br = br = mechanicalsoup.Browser()
         login_page = self.fetch("/accounts/login.aspx?returnurl=http://www.investopedia.com/simulator/")

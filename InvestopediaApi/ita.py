@@ -24,7 +24,7 @@ class Duration(Enum):
 
 
 class Account:
-    BASE_URL = 'http://www.investopedia.com'
+    BASE_URL = 'https://www.investopedia.com'
 
     def __init__(self, email, password, competition_number=0):
         """

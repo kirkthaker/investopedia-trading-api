@@ -341,6 +341,7 @@ def get_quote(symbol):
     parsed_html = response.soup
     try:
         quote = parsed_html.find('td', attrs={'id': quote_id}).text
+        quote = quote.replace(",", "")
     except:
         return False
     return float(quote)

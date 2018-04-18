@@ -134,3 +134,11 @@ client.trade("GOOG", ita.Action.buy, 10, "Limit", 500)
 ```
 
 You can browse through the code (it's only in one file) to get a more thorough understanding of the possibilities.
+
+## Testing
+
+All Tests: `python -m unittest discover`
+
+### Feature Tests
+
+Feature tests require a config file to be set up `InvestopediaApi/tests/config.py`. Instructions are in `InvestopediaApi/tests/config.example.py`.
